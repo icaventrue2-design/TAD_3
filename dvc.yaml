@@ -6,3 +6,10 @@ stages:
     - src\preprocess.py
     outs:
     - data\processed
+  train_finetune_resnet:
+    cmd: pyton src\train_resnet50.py
+    deps:
+    - data\processed
+    - src\train_resnet50.py
+    outs:
+    - models\resnet50_finetuned_best.keras

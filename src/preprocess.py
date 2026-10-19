@@ -42,7 +42,7 @@ def preprocess_data(input_dir="data/raw", output_dir="data/processed", img_size=
     train_df, test_df = train_test_split(df, test_size=0.20, random_state=42)
     df.to_csv(os.path.join(output_dir, "train_processed.csv"), index=False)
     change_skale(train_df, img_size=(512, 512))
-    change_skale(test_df, train=False)
+    change_skale(test_df, train=False, img_size=(512, 512))
 
     
 
