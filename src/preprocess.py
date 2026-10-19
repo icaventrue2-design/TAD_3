@@ -29,7 +29,7 @@ def change_skale(df, input_dir="data/raw", output_dir="data/processed", img_size
     print("Предобработка завершена успешно!")
 
 
-def preprocess_data(input_dir="data/raw", output_dir="data/processed", img_size=(2048, 1365)):
+def preprocess_data(input_dir="data/raw", output_dir="data/processed", img_size=(512, 512)):
     os.makedirs(os.path.join(output_dir, "images_train"), exist_ok=True)
     os.makedirs(os.path.join(output_dir, "images_test"), exist_ok=True)
 
@@ -41,7 +41,7 @@ def preprocess_data(input_dir="data/raw", output_dir="data/processed", img_size=
 
     train_df, test_df = train_test_split(df, test_size=0.20, random_state=42)
     df.to_csv(os.path.join(output_dir, "train_processed.csv"), index=False)
-    change_skale(train_df)
+    change_skale(train_df, img_size=(512, 512))
     change_skale(test_df, train=False)
 
     
