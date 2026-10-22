@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
+from preprocess import load_image, make_dataset
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
@@ -53,74 +54,6 @@ print("Train samples:", len(train_part))
 print("Validation samples:", len(val_part))
 print(train_part["label"].value_counts().sort_index())
 
-AUTOTUNE = tf.data.AUTOTUNE
-
-
-def load_image(image_id, label=None, training=True):
-    if training:
-        image_path = tf.strings.join([
-            IMAGE_DIR, "/", "images_train", "/",
-            image_id,
-            ".jpg"
-        ])
-    else:
-        image_path = tf.strings.join([
-            IMAGE_DIR, "/", "images_test", "/",
-            image_id,
-            ".jpg"
-        ])
-
-    image = tf.io.read_file(image_path)
-    image = tf.io.decode_jpeg(image, channels=3)
-    image = tf.image.resize(
-        image,
-        [IMAGE_SIZE, IMAGE_SIZE]
-    )
-    image = tf.cast(image, tf.float32)
-
-    if label is None:
-        return image
-
-    return image, label
-
-
-def make_dataset(df, training=False):
-    paths = df["image_id"].astype(str).values
-
-    if "label" in df.columns:
-        labels = df["label"].values.astype("int32")
-
-        ds = tf.data.Dataset.from_tensor_slices(
-            (paths, labels)
-        )
-        if training:
-            ds = ds.map(
-                lambda path, label: load_image(path, label),    
-                num_parallel_calls=AUTOTUNE
-            )
-        else:
-            ds = ds.map(
-                lambda path, label, training: load_image(path, label, training),
-                num_parallel_calls=AUTOTUNE
-            )
-    else:
-        ds = tf.data.Dataset.from_tensor_slices(paths)
-        ds = ds.map(
-            load_image,
-            num_parallel_calls=AUTOTUNE
-        )
-
-    if training:
-        ds = ds.shuffle(
-            buffer_size=len(df),
-            seed=SEED
-        )
-
-    ds = ds.batch(BATCH_SIZE)
-    ds = ds.prefetch(AUTOTUNE)
-
-    return ds
-
 
 train_ds = make_dataset(train_part, training=True)
 val_ds = make_dataset(val_part, training=True)
@@ -141,8 +74,8 @@ inputs = tf.keras.Input(
 
 x = tf.keras.applications.resnet50.preprocess_input(inputs)
 
-# training=False сохраняет BatchNormalization
-# в режиме inference даже при fine-tuning
+training=False сохраняет BatchNormalization
+в режиме inference даже при fine-tuning
 x = base_model(x, training=False)
 
 x = tf.keras.layers.GlobalAveragePooling2D()(x)
@@ -156,38 +89,38 @@ outputs = tf.keras.layers.Dense(
 model = tf.keras.Model(inputs, outputs)
 model.summary()
 
-# model.compile(
-#     optimizer=tf.keras.optimizers.Adam(
-#         learning_rate=1e-3
-#     ),
-#     loss="sparse_categorical_crossentropy",
-#     metrics=["accuracy"]
-# )
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(
+        learning_rate=1e-3
+    ),
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"]
+)
 
-# callbacks_head = [
-#     tf.keras.callbacks.ModelCheckpoint(
-#         "resnet50_head_best.keras",
-#         monitor="val_loss",
-#         save_best_only=True,
-#         mode="min",
-#         verbose=1
-#     ),
-#     tf.keras.callbacks.EarlyStopping(
-#         monitor="val_loss",
-#         patience=3,
-#         restore_best_weights=True,
-#         verbose=1
-#     )
-# ]
+callbacks_head = [
+    tf.keras.callbacks.ModelCheckpoint(
+        "resnet50_head_best.keras",
+        monitor="val_loss",
+        save_best_only=True,
+        mode="min",
+        verbose=1
+    ),
+    tf.keras.callbacks.EarlyStopping(
+        monitor="val_loss",
+        patience=3,
+        restore_best_weights=True,
+        verbose=1
+    )
+]
 
-# history_head = model.fit(
-#     train_ds,
-#     validation_data=val_ds,
-#     epochs=HEAD_EPOCHS,
-#     callbacks=callbacks_head
-# )
+history_head = model.fit(
+    train_ds,
+    validation_data=val_ds,
+    epochs=HEAD_EPOCHS,
+    callbacks=callbacks_head
+)
 
-# Загружаем лучшую модель после первого этапа
+Загружаем лучшую модель после первого этапа
 model = tf.keras.models.load_model(
     "resnet50_head_best.keras"
 )

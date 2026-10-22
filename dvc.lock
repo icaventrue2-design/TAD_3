@@ -1,7 +1,7 @@
 schema: '2.0'
 stages:
   preprocess_data:
-    cmd: python src\preprocess.py
+    cmd: python src\prepare.py
     deps:
     - path: data\raw
       hash: md5
@@ -10,11 +10,44 @@ stages:
       nfiles: 3645
     - path: src\preprocess.py
       hash: md5
-      md5: dfca146d794a8c64414a295710de7fa6
-      size: 2294
+      md5: b897a82f79f53fbb4bc9ba2b83339ea3
+      size: 4283
+    params:
+      params.yaml:
+        data.augment: true
+        data.image_size: 128
+        data.seed: 42
     outs:
     - path: data\processed
       hash: md5
-      md5: 8b7565a531c86c354ee45c207347a617.dir
-      size: 59498057
-      nfiles: 1823
+      md5: 8765a902a13f039591464d6e5f186dc9.dir
+      size: 18633759
+      nfiles: 4735
+  train_eval:
+    cmd: python src\train_eval.py
+    deps:
+    - path: data\processed
+      hash: md5
+      md5: 8765a902a13f039591464d6e5f186dc9.dir
+      size: 18633759
+      nfiles: 4735
+    - path: src\extract_HOG.py
+      hash: md5
+      md5: 2d1cd27f947e923e83b716f731cb5eee
+      size: 1789
+    - path: src\extract_color_texture.py
+      hash: md5
+      md5: bd7d03fc95cdc19422b71b1e591a7ac4
+      size: 3487
+    - path: src\train_eval.py
+      hash: md5
+      md5: 95f754aa6a72f7c010b2aec653576e91
+      size: 4584
+    params:
+      params.yaml:
+        train.model_name: knn
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: 2f6c178e57fcb81b21d6adc92476fd65
+      size: 78

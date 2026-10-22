@@ -1,0 +1,7 @@
+data:
+  image_size: 128
+  seed: 42
+  augment: true
+
+train:
+  model_name: knn

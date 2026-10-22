@@ -1,15 +1,26 @@
 stages:
   preprocess_data:
-    cmd: python src\preprocess.py
+    cmd: python src\prepare.py
     deps:
     - data\raw
     - src\preprocess.py
+    params:
+    - data.augment
+    - data.image_size
+    - data.seed
     outs:
     - data\processed
-  train_finetune_resnet:
-    cmd: pyton src\train_resnet50.py
+  
+  train_eval:
+    cmd: python src\train_eval.py
     deps:
     - data\processed
-    - src\train_resnet50.py
-    outs:
-    - models\resnet50_finetuned_best.keras
+    - src\train_eval.py
+    - src\extract_color_texture.py
+    - src\extract_HOG.py
+    params:
+    - train.model_name
+    metrics:
+    - metrics.json:
+        cache: false
+    

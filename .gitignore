@@ -3,3 +3,4 @@ data\raw
 data\processed
 dvc-storage
 models
+src/__pycache__/
