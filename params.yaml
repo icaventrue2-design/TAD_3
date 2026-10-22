@@ -4,4 +4,4 @@ data:
   augment: true
 
 train:
-  model_name: knn
+  model_name: random_forest

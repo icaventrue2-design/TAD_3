@@ -3,7 +3,7 @@ stages:
     cmd: python src\prepare.py
     deps:
     - data\raw
-    - src\preprocess.py
+    - src\prepare.py
     params:
     - data.augment
     - data.image_size

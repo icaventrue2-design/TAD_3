@@ -8,10 +8,10 @@ stages:
       md5: 72702369d5858c53a1b65f318937f28c.dir
       size: 823792065
       nfiles: 3645
-    - path: src\preprocess.py
+    - path: src\prepare.py
       hash: md5
-      md5: b897a82f79f53fbb4bc9ba2b83339ea3
-      size: 4283
+      md5: bb8a9be7ca2cd524f97a3fdc20afa0ec
+      size: 4617
     params:
       params.yaml:
         data.augment: true
@@ -45,9 +45,9 @@ stages:
       size: 4584
     params:
       params.yaml:
-        train.model_name: knn
+        train.model_name: random_forest
     outs:
     - path: metrics.json
       hash: md5
-      md5: 2f6c178e57fcb81b21d6adc92476fd65
-      size: 78
+      md5: 7064b1a4a687203f152629cb4efa12eb
+      size: 76
