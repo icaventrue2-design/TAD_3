@@ -5,4 +5,4 @@ data:
   resnet_weights_path: models/resnet50_finetuned_best.keras
 
 train:
-  model_name: random_forest
+  model_name: knn

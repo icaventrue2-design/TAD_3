@@ -48,11 +48,11 @@ stages:
       size: 4230
     params:
       params.yaml:
-        train.model_name: random_forest
+        train.model_name: knn
     outs:
     - path: metrics.json
       hash: md5
-      md5: 540d4a4945350436c816c721e318fa67
+      md5: 8d83a7556f37b439ffa0045ee930bae6
       size: 150
   extract_features:
     cmd: python src/extract_keras_features.py
