@@ -14,15 +14,15 @@ stages:
       size: 4617
     params:
       params.yaml:
-        data.augment: true
+        data.augment: false
         data.image_size: 512
         data.seed: 42
     outs:
     - path: data\processed
       hash: md5
-      md5: 2cff2901e9c5360fb0daf5cbdc945b35.dir
-      size: 154450546
-      nfiles: 4735
+      md5: 8b7565a531c86c354ee45c207347a617.dir
+      size: 59498057
+      nfiles: 1823
   train_eval:
     cmd: python src\train_eval.py
     deps:
@@ -32,27 +32,27 @@ stages:
       size: 2990208
     - path: data/features/X_train_resnet.npy
       hash: md5
-      md5: 7e02d61147c9685504f42e0de75e6294
-      size: 35782784
+      md5: ce7ecfd1b081e5335fbf14eed6343952
+      size: 11927680
     - path: data/features/y_test_resnet.npy
       hash: md5
       md5: fa10cf355595310c699c74b050000bef
       size: 3048
     - path: data/features/y_train_resnet.npy
       hash: md5
-      md5: 37d59dc727b6c43e0b946fde03d9cdf4
-      size: 35072
+      md5: 646ad875cbe40c93c7c0ee7da6c82e33
+      size: 11776
     - path: src\train_eval.py
       hash: md5
       md5: 53e80821bb7090cc2ffbb1a89e48d03b
       size: 4230
     params:
       params.yaml:
-        train.model_name: knn
+        train.model_name: random_forest
     outs:
     - path: metrics.json
       hash: md5
-      md5: 8d83a7556f37b439ffa0045ee930bae6
+      md5: 2e3053287a9eccd13c7bdefdd4e49cfd
       size: 150
   extract_features:
     cmd: python src/extract_keras_features.py
@@ -64,17 +64,17 @@ stages:
       nfiles: 365
     - path: data/processed/images_train
       hash: md5
-      md5: 86ad1def3063dea2b2cf02219e984808.dir
-      size: 142417510
-      nfiles: 4368
+      md5: 9edc43e4261cd981a2e3f495293cf324.dir
+      size: 47537497
+      nfiles: 1456
     - path: data/processed/test_processed.csv
       hash: md5
       md5: 0709215474ae79e35d611a2aacc3ac5a
       size: 7126
     - path: data/processed/train_processed.csv
       hash: md5
-      md5: 35359e971559fda59749f5be28ebe740
-      size: 100752
+      md5: 3ad5b4ce30287995a61ed7bdbd62464d
+      size: 28276
     - path: models/resnet50_finetuned_best.keras
       hash: md5
       md5: 35ce54d52fbd9ec331812b0b838cc8bd
@@ -93,13 +93,13 @@ stages:
       size: 2990208
     - path: data/features/X_train_resnet.npy
       hash: md5
-      md5: 7e02d61147c9685504f42e0de75e6294
-      size: 35782784
+      md5: ce7ecfd1b081e5335fbf14eed6343952
+      size: 11927680
     - path: data/features/y_test_resnet.npy
       hash: md5
       md5: fa10cf355595310c699c74b050000bef
       size: 3048
     - path: data/features/y_train_resnet.npy
       hash: md5
-      md5: 37d59dc727b6c43e0b946fde03d9cdf4
-      size: 35072
+      md5: 646ad875cbe40c93c7c0ee7da6c82e33
+      size: 11776
