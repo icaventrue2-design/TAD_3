@@ -7,7 +7,7 @@ from PIL import Image
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from extract_color_texture import extract_features
 from extract_HOG import extract_Hog
 
@@ -54,29 +54,24 @@ if __name__ == "__main__":
         params = yaml.safe_load(f)
 
     model_name = params["train"]["model_name"]
-    output_dir = "data/processed"
+    output_dir = "data/features"
     seed = params["data"]["seed"]
     
-    # 2. Загрузка обработанных таблиц
-    train_df = pd.read_csv(os.path.join(output_dir, "train_processed.csv"))
-    test_df = pd.read_csv(os.path.join(output_dir, "test_processed.csv"))
+    # 2. Загрузка признаков и меток
+    print("Загрузка признаков ResNet50...")
+    X_train = np.load(f"{output_dir}/X_train_resnet.npy")
+    y_train = np.load(f"{output_dir}/y_train_resnet.npy")
+    X_test = np.load(f"{output_dir}/X_test_resnet.npy")
+    y_test = np.load(f"{output_dir}/y_test_resnet.npy")
     
     # 3. Инициализация модели
     print(f"Инициализация модели: {model_name}")
     if model_name == "random_forest":
-        X_train, y_train = extract_features(train_df, os.path.join(output_dir, "images_train"))
-        X_test, y_test = extract_features(test_df, os.path.join(output_dir, "images_test"))
-        model = RandomForestClassifier(n_estimators=100, random_state=seed, n_jobs=-1)
+        model = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
     elif model_name == "svm":
-        X_train, y_train = extract_Hog(train_df, os.path.join(output_dir, "images_train"))
-        X_test, y_test = extract_Hog(test_df, os.path.join(output_dir, "images_test"))
-        model = SVC(kernel="rbf", C=1.0, random_state=seed)
+        model = SVC(kernel="rbf", C=1.0, random_state=42)
     elif model_name == "knn":
-        X_train, y_train = extract_features_and_labels(train_df, os.path.join(output_dir, "images_train"))
-        X_test, y_test = extract_features_and_labels(test_df, os.path.join(output_dir, "images_test"))
         model = KNeighborsClassifier(n_neighbors=5, n_jobs=-1)
-    else:
-        raise ValueError(f"Неизвестная модель: {model_name}")
         
     # 4. Обучение
     print("Начало обучения (это может занять время)...")
@@ -87,12 +82,11 @@ if __name__ == "__main__":
     preds = model.predict(X_test)
     
     # Используем average='weighted' для мультиклассовой классификации
-    acc = accuracy_score(y_test, preds)
-    f1 = f1_score(y_test, preds, average="weighted")
-    
     metrics = {
-        "accuracy": float(acc),
-        "f1_score": float(f1)
+        "accuracy": float(accuracy_score(y_test, preds)),
+        "f1_score": float(f1_score(y_test, preds, average="weighted")),
+        "precision": float(precision_score(y_test, preds, average="weighted", zero_division=0)),
+        "recall": float(recall_score(y_test, preds, average="weighted", zero_division=0))
     }
     
     print(f"Результаты: {metrics}")

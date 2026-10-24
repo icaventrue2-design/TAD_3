@@ -11,13 +11,31 @@ stages:
     outs:
     - data\processed
   
+  extract_features:
+    cmd: python src/extract_keras_features.py
+    deps:
+      - src/extract_keras_features.py
+      - ${data.resnet_weights_path} # DVC берет путь напрямую из params.yaml
+      - data/processed/images_train
+      - data/processed/images_test
+      - data/processed/train_processed.csv
+      - data/processed/test_processed.csv
+    params:
+      - data.resnet_weights_path
+    outs:
+      - data/features/X_train_resnet.npy
+      - data/features/y_train_resnet.npy
+      - data/features/X_test_resnet.npy
+      - data/features/y_test_resnet.npy
+
   train_eval:
     cmd: python src\train_eval.py
     deps:
-    - data\processed
     - src\train_eval.py
-    - src\extract_color_texture.py
-    - src\extract_HOG.py
+    - data/features/X_train_resnet.npy
+    - data/features/y_train_resnet.npy
+    - data/features/X_test_resnet.npy
+    - data/features/y_test_resnet.npy
     params:
     - train.model_name
     metrics:
